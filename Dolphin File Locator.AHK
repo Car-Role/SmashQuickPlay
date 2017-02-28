@@ -1,0 +1,30 @@
+#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+#Warn  
+SendMode Input  
+SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+#SingleInstance ignore
+#WinActivateForce 
+DetectHiddenWindows, on
+CoordMode, Pixel, Relative
+
+
+IfExist, Dolphin - Shortcut.lnk	
+	{
+	MsgBox, Note: Make sure you don't have a "Dolphin - Shortcut" file in "%A_ScriptDir%"! before this process
+	exit
+	}
+IfNotExist, Dolphin - Shortcut
+	MsgBox, Show me where your FM folder is!
+		FileSelectFolder, FMLocation,, 4
+			If FMLocation = 
+				{
+				MsgBox, You didn't select a folder.
+				}
+			Else {
+					MsgBox, 4,, You selected folder "%FMLocation%" is this your FasterMelee folder?
+						IfMsgBox, yes
+						FileCreateShortcut, %FMLocation%\Dolphin.exe, Dolphin - Shortcut.lnk, %A_ScriptDir%
+						MsgBox, If FasterMelee ever updates or you move your FasterMelee folder you must redo this process
+					}
+return
+
