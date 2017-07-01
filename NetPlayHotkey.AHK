@@ -1,5 +1,5 @@
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn  
+#Warn,
 SendMode Input  
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #SingleInstance ignore
@@ -27,7 +27,7 @@ SetKeyDelay, -1
 			}
 		}
 	HomeWindowHandler()
-	NetPlaySetupHanlderHost()
+	NetPlaySetupHandlerHost()
 	NetPlayWindowHandler()	
 	Sleep 200
 	Flag := 1 ;Hotkey successfully completed
@@ -61,7 +61,7 @@ return
 			DirectoryLoad()
 		}
 	HomeWindowHandler()
-	NetPlaySetupHanlderConnect()
+	NetPlaySetupHandlerConnect()
 	sleep, 200
 	Flag := 1
 return
@@ -119,27 +119,32 @@ NetPlayWindowHandler(){
 return
 }
 
-NetPlaySetupHanlderHost(){
+NetPlaySetupHandlerHost(){
 	winwait Dolphin NetPlay Setup
 	Sleep 50
+	;~ MsgBox,, break1
 	hwnd := winexist()  ; lock target handle to last found window
+	;~ MsgBox,, break2
 	WinActivate, ahk_id %hwnd%
-	ControlSend, ahk_parent, ^{tab}, ahk_id %hwnd%
+	ControlSend, _wx_SysTabCtl321, ^{tab}, ahk_id %hwnd%
+	sleep 50
+	;~ MsgBox,, break3
 	;~ control tabright,, _wx_SysTabCtl321, ahk_id %hwnd%
 	;~ controlclick Button4, ahk_id %hwnd%,,,,NA  ;randomly not Clicking button 4...
-	ControlFocus, button4, ahk_id %hwnd%
-	ControlSend, button4, {enter}, ahk_id %hwnd%
+	ControlFocus, button5, ahk_id %hwnd%
+	ControlSend, button5, {enter}, ahk_id %hwnd%
+	;~ MsgBox,, break4
 return
 }
 
-NetPlaySetupHanlderConnect(){	
+NetPlaySetupHandlerConnect(){	
 	winwait Dolphin NetPlay Setup
 	Sleep 50
 	hwnd := winexist()  ; lock target handle to last found window
 	WinActivate, ahk_id %hwnd%
 	ControlSetText, edit3, %Clipboard%, ahk_id %hwnd%
-	ControlFocus, button2, ahk_id %hwnd%
-	ControlSend, button2, {enter}, ahk_id %hwnd%
+	ControlFocus, button3, ahk_id %hwnd%
+	ControlSend, button3, {enter}, ahk_id %hwnd%
 return
 }
 
@@ -148,3 +153,13 @@ return
 	WinActivate, ahk_id 0x520fc2
 	Send ^s
 	Reload
+	
+	~^Left::
+	FileGetShortcut, Dolphin - Shortcut.lnk,, ODir
+	TF_Replace(ODir "\User\GameSettings\GALE01.ini", "32", "16")
+	;~ Msgbox,,, %ODir%\User\GameSettings\GALE01.ini
+	return
+
+~^Right::
+ControlSend, Edit3 , {down}, Dolphin NetPlay
+return	
