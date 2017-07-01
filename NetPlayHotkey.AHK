@@ -6,7 +6,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #WinActivateForce 
 DetectHiddenWindows, on
 CoordMode, Pixel, Relative
-SetTitleMatchMode, 3
+SetTitleMatchMode, 2
+SetTitleMatchMode, fast
 SetKeyDelay, -1
 
 
@@ -18,11 +19,11 @@ SetKeyDelay, -1
 	IfWinExist, Dolphin NetPlay 
 		WinClose		
 	else 	{
-		IfWinExist Ishiiruka-Dolphin727(0b00f1f) ;Only the dolphin emulator open
-			WinActivate
+		IfWinExist, Ishiiruka-Dolphin ;Only the dolphin emulator open
+			WinActivate Ishiiruka-Dolphin
 		else{
 			Run "Dolphin - Shortcut" ;nothing open;
-			WinActivate
+			WinActivate Ishiiruka-Dolphin
 			DirectoryLoad()
 			}
 		}
@@ -39,7 +40,7 @@ return
 ^f12:: 
 	Flag := 0
 	SetTimer, LoopLimit, -7000 ;<-- set a oneshot 7second timer to stop the loop
-	clipboard =  ;Clears Clipboard
+	Clipboard =  ;Clears Clipboard
 	Send ^c
 	sleep 150
 	Clipboard = %Clipboard%
@@ -49,15 +50,21 @@ return
 	MsgBox, Please highlight text before pressing Ctrl+F12!
     Exit
 	}
+	StringLen, CodeLen, Clipboard
+	If (CodeLen > 12) 	{
+	Flag := 1
+	MsgBox,, Warning, Host code size is too large. `nPlease recheck that you have the correct code
+    Exit
+	}
 	IfWinExist, Dolphin NetPlay 
 		{	
 		WinClose
-		WinActivate Ishiiruka-Dolphin727(0b00f1f)
+		WinActivate Ishiiruka-Dolphin
 		}
-		IfWinNotExist Ishiiruka-Dolphin727(0b00f1f) ;Only the dolphin emulator open
+		IfWinNotExist Ishiiruka-Dolphin ;Only the dolphin emulator open
 		{
 			Run "Dolphin - Shortcut" ;nothing open;
-			WinActivate, Ishiiruka-Dolphin727(0b00f1f)
+			WinActivate, Ishiiruka-Dolphin
 			DirectoryLoad()
 		}
 	HomeWindowHandler()
@@ -101,7 +108,7 @@ return
 }
 
 HomeWindowHandler(){
-	WinActivate, Ishiiruka-Dolphin727(0b00f1f)
+	WinActivate, Ishiiruka-Dolphin
 	Sleep 50
 	hwnd := winexist()
 	Send, {alt down}{t}{n}{alt up} 
@@ -110,11 +117,13 @@ return
 
 NetPlayWindowHandler(){
 	WinWait Dolphin NetPlay
+	WinActivate Dolphin NetPlay
+	;~ msgbox,, netplay window found
 	Sleep 50
 	hwnd := winexist()
 	RoomID = ""
 	while !(RoomID ~= "[0-9a-f]{8}")
-		controlgettext, RoomID, Static1, ahk_id %hwnd%
+		controlgettext, RoomID, Static1,  Dolphin NetPlay
 	Clipboard = %RoomID%
 return
 }
